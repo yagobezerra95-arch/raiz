@@ -294,7 +294,7 @@
   </div>
   <div id="app"></div>
   <footer>
-    Protótipo em construção · dados levantados em agosto de 2026, com fonte e data em cada número · cada causa mostra a fonte usada — quando não achamos dado confiável, isso fica dito, em vez de inventado. · fotos: em breve.
+    Protótipo em construção · dados levantados em agosto de 2026, com fonte e data em cada número · cada causa mostra a fonte usada
   </footer>
 </div>
 
@@ -317,7 +317,7 @@ const PRODUTOS = {
       {periodo:'julho de 2026 (mensal)', valor:'-19,59%', fonte:'IBGE — IPCA oficial', url:'https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/47739-ipca-fica-em-0-07-em-julho', data:'11 de agosto de 2026'},
       {periodo:'1ª semana de agosto de 2026 (SP)', valor:'-7,5%', fonte:'CEPEA/ESALQ-USP', url:'https://www.noticiasagricolas.com.br/noticias/hortifruti/426078-batata-cepea-precos-recuam-com-intensificacao-da-safra-e-ritmo-normal-de-colheita.html', data:'7 de agosto de 2026'}
     ],
-    nota:'O IBGE não publica uma variação oficial "em 12 meses" isolada para a batata. O que dá para afirmar com fonte: alta acumulada de +100% no 1º semestre de 2026, seguida de forte queda em julho e agosto com a entrada da safra de inverno — um padrão de "gangorra" comum nesse produto.',
+    nota:'O IBGE não publica uma variação oficial "em 12 meses" isolada para a batata. O que dá para afirmar com fonte: alta acumulada de +100% no 1º semestre de 2026, seguida de forte queda em julho e agosto com a entrada da safra de inverno, um padrão de "gangorra" comum nesse produto.',
     causas:['batata-clima','batata-fertilizante','batata-diesel','batata-colheita']
   },
   arroz: {
@@ -399,10 +399,10 @@ const PRODUTOS = {
 
 const CAUSAS = {
   'batata-clima':{titulo:'Clima instável na entressafra', categoria:'clima', produtoPai:'batata',
-    resumo:'Chuvas acima da média no Cerrado mineiro e no Sudeste, alternadas com períodos secos no Sul, prejudicaram a colheita e a qualidade da batata em vários meses de 2026. Como o ciclo da cultura é curto e o produto é perecível, qualquer problema já aparece rápido no preço — criando picos e quedas fortes ao longo do ano.',
+    resumo:'Chuvas acima da média no Cerrado mineiro e no Sudeste, alternadas com períodos secos no Sul, prejudicaram a colheita e a qualidade da batata em vários meses de 2026. Como o ciclo da cultura é curto e o produto é perecível, qualquer problema já aparece rápido no preço, criando picos e quedas fortes ao longo do ano.',
     fontes:[{titulo:'ABBIN — Preços em alta: o que está por trás da atual gangorra da batata', url:'https://abbin.org/precos-em-alta-o-que-esta-por-tras-da-atual-gangorra-da-batata-no-brasil/', data:'março de 2026'}]},
   'batata-fertilizante':{titulo:'Fertilizante mais caro', categoria:'cambio-economia', produtoPai:'batata', macro:'guerra-ucrania',
-    resumo:'O Brasil importa cerca de 85% do fertilizante que usa, e Rússia e Belarus respondem por boa parte das exportações mundiais de potássio. Entre janeiro e abril de 2026, os preços de importação de fertilizante subiram entre 18% e 41% conforme o tipo — encarecendo diretamente o custo de produzir batata, cultura que usa bastante insumo.',
+    resumo:'O Brasil importa cerca de 85% do fertilizante que usa, e Rússia e Belarus respondem por boa parte das exportações mundiais de potássio. Entre janeiro e abril de 2026, os preços de importação de fertilizante subiram entre 18% e 41% conforme o tipo, encarecendo diretamente o custo de produzir batata, cultura que usa bastante insumo.',
     fontes:[{titulo:'Scot Consultoria — Carta Insumos', url:'https://www.scotconsultoria.com.br/noticias/cartas/60471/carta-insumos-custos-de-importa%C3%A7%C3%A3o-de-fertilizantes-crescem-no-primeiro-quadrimestre-de-2026-e-elevam-preocupa%C3%A7%C3%B5es-para-a-safra-2026-27.htm', data:'21 de maio de 2026'},{titulo:'Blocktrends — Crise de fertilizantes 2026', url:'https://blocktrends.com.br/crise-fertilizantes-2026-guerra-ucrania-impacto-agronegocio-brasil/', data:'abril de 2026'}]},
   'batata-diesel':{titulo:'Diesel mais caro encarece o frete', categoria:'logistica', produtoPai:'batata', macro:'diesel-alta',
     resumo:'Em março de 2026, a Petrobras reajustou o diesel em R$ 0,38/litro (alta de 11,6%) nas refinarias. Reajustes assim disparam automaticamente a atualização da tabela de frete mínimo da ANTT, encarecendo o transporte da batata da lavoura até o mercado.',
@@ -559,10 +559,10 @@ function viewHome(){
 
   return '<div class="intro">' +
     '<span class="kicker">Investigação de preços · Brasil, 2026</span>' +
-    '<h1>Por que a comida está tão cara?</h1>' +
-    '<p>Não é só um vilão. Escolha um alimento, veja o que aconteceu com o preço dele e clique em cada causa para investigar até a raiz — com fonte oficial e data em cada número que aparece aqui.</p>' +
+    '<h1>Por que a comida está cara?</h1>' +
+    '<p>Não é só um vilão. Escolha um alimento, veja o que aconteceu com o preço dele e clique em cada causa para investigar até a raiz, com fonte oficial e data em cada número que aparece aqui.</p>' +
     '</div>' +
-    '<p class="section-label">Alimentos investigados</p>' +
+    '<p class="section-label">Alimentos</p>' +
     '<div class="grid">'+cards+'</div>';
 }
 
