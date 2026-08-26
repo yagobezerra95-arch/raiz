@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raiz do Preço</title>
+<meta name="description" content="Por que os alimentos estão caros no Brasil — investigue a raiz de cada causa, com dados e fontes oficiais.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23E0610F%22/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF8F4;
+    --surface:#FFFFFF;
+    --surface-2:#F2EEE4;
+    --ink:#1B1A16;
+    --ink-muted:#6B6A5F;
+    --border:#E5E1D6;
+    --accent:#E0610F;
+    --accent-ink:#FFFFFF;
+    --up:#B23A1F;
+    --down:#2E7D4F;
+    --cat-clima:#2F6F66;
+    --cat-economia:#8C6A18;
+    --cat-geo:#6B3A54;
+    --cat-logistica:#3B5872;
+    --cat-tributario:#9A4A2E;
+    --radius-card:10px;
+    --radius-sm:6px;
+    --shadow:0 1px 2px rgba(27,26,22,0.05), 0 3px 14px rgba(27,26,22,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17140F;
+      --surface:#1E1B15;
+      --surface-2:#241F17;
+      --ink:#F1ECE1;
+      --ink-muted:#A79E8C;
+      --border:#332D22;
+      --accent:#FF8A42;
+      --accent-ink:#17140F;
+      --up:#E2775F;
+      --down:#6FBF86;
+      --cat-clima:#5FB3A4;
+      --cat-economia:#D2A94A;
+      --cat-geo:#C17EA3;
+      --cat-logistica:#7FA3C9;
+      --cat-tributario:#E08A63;
+      --shadow:0 1px 2px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17140F;
+    --surface:#1E1B15;
+    --surface-2:#241F17;
+    --ink:#F1ECE1;
+    --ink-muted:#A79E8C;
+    --border:#332D22;
+    --accent:#FF8A42;
+    --accent-ink:#17140F;
+    --up:#E2775F;
+    --down:#6FBF86;
+    --cat-clima:#5FB3A4;
+    --cat-economia:#D2A94A;
+    --cat-geo:#C17EA3;
+    --cat-logistica:#7FA3C9;
+    --cat-tributario:#E08A63;
+    --shadow:0 1px 2px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.35);
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Public Sans', system-ui, sans-serif;
+    font-size:16.5px;
+    line-height:1.6;
+  }
+  a{color:inherit;}
+  h1,h2,h3{
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:600;
+    text-wrap:balance;
+    margin:0 0 .35em 0;
+    letter-spacing:-.01em;
+  }
+  .mono{font-family:'IBM Plex Mono', ui-monospace, monospace;}
+  .tabular{font-variant-numeric:tabular-nums;}
+
+  .shell{max-width:1000px;margin:0 auto;padding:22px 22px 90px;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border);
+  }
+  .brand{
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:700;font-size:1.35rem;
+    text-decoration:none;color:var(--ink);
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .brand .hi{color:var(--accent);}
+  .theme-toggle{
+    border:none;background:none;color:var(--ink-muted);
+    padding:0;font-size:.76rem;font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase;letter-spacing:.08em;cursor:pointer;
+    text-decoration:underline;text-underline-offset:3px;
+  }
+  .theme-toggle:hover{color:var(--accent);}
+
+  .back-link{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'IBM Plex Mono',monospace;font-size:.8rem;
+    color:var(--ink-muted);text-decoration:none;background:none;border:none;
+    cursor:pointer;padding:0;margin-bottom:24px;
+  }
+  .back-link:hover{color:var(--accent);}
+
+  /* ---------- hero / intro ---------- */
+  .intro{margin-bottom:34px;}
+  .intro h1{font-size:2.1rem;font-weight:600;}
+  .intro p{color:var(--ink-muted);max-width:58ch;font-size:1.02rem;}
+  .intro .kicker{
+    font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.1em;
+    font-size:.72rem;color:var(--accent);margin-bottom:12px;display:block;
+  }
+
+  /* ---------- section label with short accent underline ---------- */
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.09em;
+    font-size:.76rem;color:var(--ink);font-weight:600;
+    margin:34px 0 16px 0;display:inline-block;
+    padding-bottom:8px;border-bottom:2px solid var(--accent);
+  }
+
+  /* ---------- category label (plain colored text, no pill) ---------- */
+  .cat-label{
+    font-family:'IBM Plex Mono',monospace;font-size:.68rem;text-transform:uppercase;
+    letter-spacing:.08em;white-space:nowrap;font-weight:500;
+  }
+  .cat-label.clima{color:var(--cat-clima);}
+  .cat-label.cambio-economia{color:var(--cat-economia);}
+  .cat-label.geopolitica{color:var(--cat-geo);}
+  .cat-label.logistica{color:var(--cat-logistica);}
+  .cat-label.tributario{color:var(--cat-tributario);}
+
+  /* ---------- price delta (plain colored text, no chip) ---------- */
+  .delta{font-family:'IBM Plex Mono',monospace;font-size:.9rem;font-weight:600;}
+  .delta.alta{color:var(--up);}
+  .delta.baixa{color:var(--down);}
+
+  /* ---------- photo placeholder — blank on purpose, swap in a real <img> later ---------- */
+  .photo{background:var(--surface-2);}
+
+  /* ---------- cards & grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+  .card{
+    display:block;text-decoration:none;color:var(--ink);
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);
+    overflow:hidden;box-shadow:var(--shadow);
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .card:hover{transform:translateY(-2px);border-color:var(--accent);}
+  @media (prefers-reduced-motion: reduce){ .card{transition:none;} .card:hover{transform:none;} }
+
+  .prod-card .photo{aspect-ratio:4/3;}
+  .prod-card .body{padding:16px;}
+  .prod-card .nome{font-size:1.15rem;margin-bottom:6px;}
+  .prod-card .preco{font-family:'IBM Plex Mono',monospace;font-size:.92rem;color:var(--ink-muted);margin-bottom:10px;}
+
+  .causa-card{padding:18px;}
+  .causa-card .cat-label{display:block;margin-bottom:10px;}
+  .causa-card h3{font-size:1.04rem;margin-bottom:6px;}
+  .causa-card p{font-size:.87rem;color:var(--ink-muted);margin:0;}
+  .causa-card .arrow{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--accent);margin-top:12px;display:inline-block;}
+
+  /* ---------- product detail ---------- */
+  .prod-head{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);
+    overflow:hidden;margin-bottom:30px;box-shadow:var(--shadow);
+  }
+  .prod-head .photo{aspect-ratio:16/7;}
+  .prod-head .body{padding:24px;}
+  .prod-head h1{font-size:1.7rem;margin-bottom:2px;}
+  .prod-head .unidade-label{color:var(--ink-muted);font-size:.88rem;}
+  .price-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:14px 0 4px;}
+  .price-row .valor{font-family:'IBM Plex Mono',monospace;font-size:1.9rem;font-weight:500;}
+  .destaque-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:.92rem;color:var(--ink-muted);}
+  .destaque-line .delta{font-size:1rem;}
+
+  .fonte-line{
+    font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--ink-muted);
+    margin-top:5px;
+  }
+  .fonte-line a{color:var(--ink-muted);text-decoration:underline;text-underline-offset:2px;}
+  .fonte-line a:hover{color:var(--accent);}
+
+  details.outras{margin-top:14px;}
+  details.outras summary{
+    cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.78rem;
+    color:var(--accent);list-style:none;display:inline-flex;align-items:center;gap:5px;
+  }
+  details.outras summary::-webkit-details-marker{display:none;}
+  details.outras summary::before{content:"+";}
+  details.outras[open] summary::before{content:"–";}
+  .outras-list{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);display:flex;flex-direction:column;gap:10px;}
+  .outras-item{font-size:.88rem;}
+  .outras-item .periodo{color:var(--ink-muted);}
+  .outras-item .valor{font-family:'IBM Plex Mono',monospace;font-weight:500;}
+
+  .nota-box{
+    background:var(--surface-2);border-left:3px solid var(--accent);
+    border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+    padding:12px 16px;margin-top:16px;font-size:.87rem;color:var(--ink-muted);
+  }
+  .nota-box strong{color:var(--ink);}
+
+  /* ---------- causa / macro detail ---------- */
+  .causa-head{margin-bottom:22px;}
+  .causa-head .cat-label{display:block;margin-bottom:14px;}
+  .causa-head h1{font-size:1.65rem;}
+  .prose{font-size:1.03rem;max-width:64ch;color:var(--ink);}
+  .prose p{margin:0 0 1em 0;}
+
+  .fontes-block{
+    margin-top:24px;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius-card);padding:18px 20px;box-shadow:var(--shadow);
+  }
+  .fontes-block .section-label{margin:0 0 10px 0;font-size:.72rem;}
+  .fonte-item{
+    font-size:.86rem;padding:8px 0;border-bottom:1px dashed var(--border);
+    display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  }
+  .fonte-item:last-child{border-bottom:none;}
+  .fonte-item a{text-decoration:underline;text-underline-offset:2px;}
+  .fonte-item a:hover{color:var(--accent);}
+  .fonte-item .data{font-family:'IBM Plex Mono',monospace;font-size:.76rem;color:var(--ink-muted);white-space:nowrap;}
+
+  .connect-box{
+    margin-top:22px;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius-card);padding:18px 20px;box-shadow:var(--shadow);
+  }
+  .connect-box .section-label{margin:0 0 10px 0;font-size:.72rem;}
+  .connect-list{display:flex;flex-direction:column;}
+  .connect-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:11px 0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--ink);
+  }
+  .connect-item:last-child{border-bottom:none;}
+  .connect-item:hover .left{color:var(--accent);}
+  .connect-item .left{transition:color .12s ease;}
+  @media (prefers-reduced-motion: reduce){ .connect-item .left{transition:none;} }
+  .connect-item .prod-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--ink-muted);
+  }
+  .connect-item .go{font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:.9rem;}
+
+  .root-link{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    margin-top:24px;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius-card);padding:16px 18px;text-decoration:none;color:var(--ink);
+    box-shadow:var(--shadow);
+  }
+  .root-link:hover{border-color:var(--accent);}
+  .root-link:hover .name{color:var(--accent);}
+  .root-link .lab{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:3px;}
+  .root-link .name{font-family:'Fraunces',serif;font-weight:600;font-size:1.1rem;transition:color .12s ease;}
+  @media (prefers-reduced-motion: reduce){ .root-link .name{transition:none;} }
+  .root-link .go{font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:1.2rem;}
+
+  footer{
+    margin-top:64px;padding-top:20px;border-top:1px solid var(--border);
+    font-size:.78rem;color:var(--ink-muted);
+  }
+
+  #app{animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion: reduce){ #app{animation:none;} }
+
+  @media (max-width:520px){
+    .price-row .valor{font-size:1.6rem;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <button class="brand" onclick="location.hash='#/'">Raiz do <span class="hi">Preço</span></button>
+    <button class="theme-toggle" id="themeToggle" type="button">tema</button>
+  </div>
+  <div id="app"></div>
+  <footer>
+    Protótipo em construção · dados levantados em agosto de 2026, com fonte e data em cada número · cada causa mostra a fonte usada — quando não achamos dado confiável, isso fica dito, em vez de inventado. · fotos: em breve.
+  </footer>
+</div>
+
+<script>
+/* ===================== DATA ===================== */
+const CATEGORIAS = {
+  'clima': 'Clima',
+  'cambio-economia': 'Câmbio e Economia',
+  'geopolitica': 'Geopolítica',
+  'logistica': 'Logística',
+  'tributario': 'Tributário'
+};
+
+const PRODUTOS = {
+  batata: {
+    id:'batata', nome:'Batata',
+    preco:{valor:'R$ 2,44', unidade:'por kg (equiv. à saca de 25kg no atacado, SP)', fonte:'CEPEA/ESALQ-USP', url:'https://www.noticiasagricolas.com.br/noticias/hortifruti/426078-batata-cepea-precos-recuam-com-intensificacao-da-safra-e-ritmo-normal-de-colheita.html', data:'7 de agosto de 2026'},
+    destaque:{periodo:'acumulado no 1º semestre de 2026', valor:'+100,2%', direcao:'alta', fonte:'CNN Brasil (IBGE/IPCA-15)', url:'https://www.cnnbrasil.com.br/agro/tomate-cenoura-e-batata-acumulam-alta-superior-a-100-em-2026/', data:'25 de junho de 2026'},
+    outras:[
+      {periodo:'julho de 2026 (mensal)', valor:'-19,59%', fonte:'IBGE — IPCA oficial', url:'https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/47739-ipca-fica-em-0-07-em-julho', data:'11 de agosto de 2026'},
+      {periodo:'1ª semana de agosto de 2026 (SP)', valor:'-7,5%', fonte:'CEPEA/ESALQ-USP', url:'https://www.noticiasagricolas.com.br/noticias/hortifruti/426078-batata-cepea-precos-recuam-com-intensificacao-da-safra-e-ritmo-normal-de-colheita.html', data:'7 de agosto de 2026'}
+    ],
+    nota:'O IBGE não publica uma variação oficial "em 12 meses" isolada para a batata. O que dá para afirmar com fonte: alta acumulada de +100% no 1º semestre de 2026, seguida de forte queda em julho e agosto com a entrada da safra de inverno — um padrão de "gangorra" comum nesse produto.',
+    causas:['batata-clima','batata-fertilizante','batata-diesel','batata-colheita']
+  },
+  arroz: {
+    id:'arroz', nome:'Arroz',
+    preco:{valor:'R$ 76,20', unidade:'por saca de 50kg, em casca — preço ao produtor/indústria, RS', fonte:'CEPEA/Esalq-USP — Indicador do Arroz', url:'https://cepea.org.br/br/indicador/arroz.aspx', data:'20 de agosto de 2026'},
+    destaque:{periodo:'1º de julho a 13 de agosto de 2026 (~6 semanas)', valor:'+22%', direcao:'alta', fonte:'Planeta Arroz', url:'https://planetaarroz.com.br/preco-do-arroz-dispara-22-e-chega-a-r-7360-por-saca/', data:'13 de agosto de 2026'},
+    outras:[
+      {periodo:'12 meses até 19 de julho de 2026', valor:'-6,36% (ainda abaixo do mesmo período do ano anterior)', fonte:'aRede (via Safras & Mercado)', url:'https://arede.info/a-forca-do-agro/662087/el-nino-pode-reduzir-safra-de-arroz-em-202627', data:'19 de julho de 2026'},
+      {periodo:'pico das enchentes no RS, 28 mar. a 21 mai. de 2024', valor:'saca foi de R$ 99,13 para R$ 121,57', fonte:'Aos Fatos', url:'https://www.aosfatos.org/noticias/preco-do-arroz-enchentes-rs/', data:'21 de maio de 2024'}
+    ],
+    nota:'Este é o preço pago ao produtor — não encontramos um preço nacional de varejo em R$/kg com fonte oficial e datada para agosto de 2026. O IBGE também não isolou o item "arroz" nos releases do IPCA de junho e julho que consultamos.',
+    causas:['arroz-area-plantada','arroz-el-nino','arroz-retencao','arroz-exportacao']
+  },
+  feijao: {
+    id:'feijao', nome:'Feijão',
+    preco:{valor:'R$ 286 a R$ 327', unidade:'por saca de 60kg, carioca tipo 1 (≈ R$ 4,77–5,45/kg)', fonte:'CEPEA/CNA (Esalq-USP)', url:'https://cepea.org.br/br/indicador/feijao.aspx', data:'20 de agosto de 2026'},
+    destaque:{periodo:'janeiro a julho de 2026, preço ao consumidor', valor:'+96,8%', direcao:'alta', fonte:'VR (dados de consumo), via CNN Brasil', url:'https://www.cnnbrasil.com.br/agro/preco-do-feijao-carioca-dispara-968-em-2026-aponta-levantamento-da-vr/', data:'16 de agosto de 2026'},
+    outras:[
+      {periodo:'acumulado até maio de 2026, preço ao produtor', valor:'+85% a +90%', fonte:'Canal Rural (índice CEPEA/CNA)', url:'https://www.canalrural.com.br/economia/quebras-de-safra-sustentam-alta-do-feijao-em-2026-aponta-indice-cepea-cna/', data:'22 de junho de 2026'},
+      {periodo:'início de agosto de 2026', valor:'preços em queda com a colheita da 3ª safra', fonte:'Notícias Agrícolas / CEPEA', url:'https://www.noticiasagricolas.com.br/noticias/feijao-e-graos-especiais/426114-feijao-cepea-colheita-pressiona-carioca-neste-inicio-de-agosto.html', data:'10 de agosto de 2026'}
+    ],
+    nota:'Os números acima vêm de fontes diferentes (preço ao produtor vs. ao consumidor) e não são diretamente comparáveis entre si, mas apontam todos na mesma direção. Em agosto de 2026 os preços já vinham caindo com a nova colheita — a alta forte ficou concentrada no 1º semestre.',
+    causas:['feijao-chuva','feijao-area-plantada','feijao-estoques','feijao-produtividade']
+  },
+  cafe: {
+    id:'cafe', nome:'Café',
+    preco:{valor:'R$ 25,51', unidade:'pacote de 500g, torrado e moído (média SP) — ≈ R$ 51/kg', fonte:'IBGE, via O Tempo', url:'https://www.otempo.com.br/economia/2026/8/11/preco-do-cafe-acumula-a-maior-queda-da-era-do-plano-real-diz-ibge', data:'referente a junho de 2026'},
+    destaque:{periodo:'12 meses (jul/2025 a jul/2026)', valor:'-17,2%', direcao:'baixa', fonte:'IBGE/IPCA, via O Tempo', url:'https://www.otempo.com.br/economia/2026/8/11/preco-do-cafe-acumula-a-maior-queda-da-era-do-plano-real-diz-ibge', data:'11 de agosto de 2026'},
+    outras:[
+      {periodo:'12 meses (mai/2024 a mai/2025)', valor:'+82,24%', fonte:'IBGE/IPCA, via O Tempo', url:'https://www.otempo.com.br/economia/2026/8/11/preco-do-cafe-acumula-a-maior-queda-da-era-do-plano-real-diz-ibge', data:'citado em 11 de agosto de 2026'},
+      {periodo:'2023 a 2025, saca de café arábica no mercado físico', valor:'+155%', fonte:'Brasil de Fato (dados Embrapa Café)', url:'https://www.brasildefato.com.br/2025/01/23/producao-em-queda-e-exportacao-em-alta-o-que-explica-a-alta-do-cafe/', data:'21 de janeiro de 2025'}
+    ],
+    nota:'O café fez um ciclo: disparada forte entre 2023 e 2025 (quebra de safra + câmbio + exportação recorde) e queda acentuada ao longo de 2026 com a recuperação da safra brasileira — mas o preço de junho de 2026 ainda estava acima do início de 2025.',
+    causas:['cafe-seca-brasil','cafe-vietna','cafe-cambio','cafe-tarifa-eua','cafe-portos']
+  },
+  carne: {
+    id:'carne', nome:'Carne bovina',
+    preco:{valor:'R$ 345,70', unidade:'por arroba (15kg) de boi gordo, indicador São Paulo', fonte:'CEPEA/ESALQ-USP', url:'https://cepea.org.br/br/indicador/boi-gordo.aspx', data:'20 de agosto de 2026'},
+    destaque:{periodo:'12 meses até maio de 2026, carne bovina (IPCA)', valor:'+9,8%', direcao:'alta', fonte:'IBGE/IPCA, via O Especialista (Safra)', url:'https://oespecialista.safra.com.br/analise/inflacao-alimentos-carne-cerveja-ipca/', data:'15 de junho de 2026'},
+    outras:[
+      {periodo:'recorde histórico da série desde 1997', valor:'R$ 365,45/arroba em 9 de abril de 2026', fonte:'CEPEA/ESALQ-USP, via Canal Rural', url:'https://www.canalrural.com.br/pecuaria/preco-do-boi-gordo-atinge-maior-valor-da-serie-historica-desde-1997-diz-cepea/', data:'9 de abril de 2026'},
+      {periodo:'1º semestre de 2026, picanha', valor:'+10,66%', fonte:'IBGE/IPCA-15, via Revista Oeste', url:'https://revistaoeste.com/economia/picanha-sobe-107-e-carne-bovina-acumula-alta-em-todos-os-cortes/', data:'27 de junho de 2026'}
+    ],
+    causas:['carne-ciclo-pecuario','carne-china','carne-tarifa-eua','carne-custo-producao']
+  },
+  azeite: {
+    id:'azeite', nome:'Azeite de oliva',
+    preco:{valor:'R$ 66,10', unidade:'por litro, extra virgem (garrafa 500ml a R$ 33,05)', fonte:'Fundação Procon-SP', url:'https://www.procon.sp.gov.br/wp-content/uploads/2026/03/CAPITAL.pdf', data:'18-19 de março de 2026'},
+    destaque:{periodo:'12 meses até julho de 2026', valor:'-17,1%', direcao:'baixa', fonte:'Índice de Preços dos Supermercados (Apas/Fipe)', url:'https://mercadoeconsumo.com.br/28/07/2026/supermercados/azeite-fica-17-mais-barato-em-um-ano-mostra-levantamento-da-apas/', data:'28 de julho de 2026'},
+    outras:[
+      {periodo:'novembro de 2022 a novembro de 2023', valor:'até +80% (extra virgem)', fonte:'CNN Brasil (IPCA e importadoras)', url:'https://www.cnnbrasil.com.br/nacional/azeite-de-oliva-extra-virgem-fica-ate-80-mais-caro-no-brasil-em-2023/', data:'25 de dezembro de 2023'},
+      {periodo:'janeiro de 2021 a novembro de 2023', valor:'+95%', fonte:'Levantamento Horus, via Metrópoles', url:'https://www.metropoles.com/negocios/por-que-o-azeite-de-oliva-subiu-quase-40-e-ajudou-a-acelerar-inflacao', data:'28 de dezembro de 2023'}
+    ],
+    nota:'O azeite disparou entre 2022 e 2023 por causa da pior safra europeia em décadas, e vem caindo desde então com a recuperação da produção — mas não achamos um comparativo confiável mostrando se já voltou ao patamar de antes de 2022.',
+    causas:['azeite-seca','azeite-cambio','azeite-imposto','azeite-frete']
+  },
+  leite: {
+    id:'leite', nome:'Leite e muçarela',
+    preco:{valor:'R$ 2,75 / R$ 35,00', unidade:'litro de leite ao produtor / kg de muçarela no atacado', fonte:'CEPEA/Esalq-USP e Cileite-Embrapa', url:'https://www.noticiasagricolas.com.br/cotacoes/leite/leite-precos-ao-produtor-cepea-rs-litro', data:'junho de 2026 (recorde da série do CEPEA)'},
+    destaque:{periodo:'1º trimestre de 2026, leite ao produtor', valor:'+17,6%', direcao:'alta', fonte:'CEPEA, via Notícias Agrícolas', url:'https://www.noticiasagricolas.com.br/noticias/leite/421299-preco-do-leite-sobe-17-6-no-primeiro-trimestre-e-mercado-reage-a-oferta-restrita-no-campo.html', data:'21 de maio de 2026'},
+    outras:[
+      {periodo:'maio de 2025 a maio de 2026, muçarela no atacado', valor:'+11,7%', fonte:'Cileite/Embrapa, via O Presente Rural', url:'https://opresenterural.com.br/mucarela-sobe-117-e-sustenta-precos-dos-lacteos-no-brasil/', data:'24 de junho de 2026'},
+      {periodo:'leite ao produtor, janeiro de 2026', valor:'ainda 26,9% abaixo de jan/2025 em termos reais', fonte:'CEPEA, via O Presente Rural', url:'https://opresenterural.com.br/preco-do-leite-ao-produtor-sobe-543-mas-ainda-esta-25-abaixo-do-ano-passado/', data:'27 de fevereiro de 2026'}
+    ],
+    nota:'Mesmo com alta nominal forte em 2026, o preço ao produtor ainda estava abaixo do mesmo período de 2025 em termos reais (deflacionados) — 2025 teve uma queda severa antes desta alta.',
+    causas:['leite-entressafra','leite-custo-producao','leite-concorrencia','leite-mercosul']
+  },
+  pizza: {
+    id:'pizza', nome:'Pizza',
+    preco:{valor:'R$ 59,98', unidade:'ticket médio de transação em pizzarias no Brasil', fonte:'VR (dados de consumo), via InfoMoney', url:'https://www.infomoney.com.br/consumo/no-pais-da-pizza-meio-a-meio-o-preco-comeca-a-pesar-mais/', data:'jan/2023–15/jun/2026, publicado em 10 de julho de 2026'},
+    destaque:{periodo:'2023 até meados de 2026', valor:'+32%', direcao:'alta', fonte:'VR, via InfoMoney', url:'https://www.infomoney.com.br/consumo/no-pais-da-pizza-meio-a-meio-o-preco-comeca-a-pesar-mais/', data:'10 de julho de 2026'},
+    outras:[
+      {periodo:'dez/2021 a ago/2025, amostra de bairros de São Paulo', valor:'entre +37% e +84% conforme o bairro', fonte:'Pesquisa Fatec Sebrae, via InfoMoney', url:'https://www.infomoney.com.br/minhas-financas/quantas-pizzas-o-seu-salario-compra-conheca-o-indice-mozarela/', data:'17 de setembro de 2025'}
+    ],
+    nota:'Não existe uma pesquisa nacional oficial do preço médio de "uma pizza grande no iFood" especificamente — usamos o ticket médio de pizzarias (presencial + delivery) como o melhor indicador público disponível.',
+    causas:['pizza-queijo','pizza-trigo','pizza-taxa-ifood','pizza-margem']
+  }
+};
+
+const CAUSAS = {
+  'batata-clima':{titulo:'Clima instável na entressafra', categoria:'clima', produtoPai:'batata',
+    resumo:'Chuvas acima da média no Cerrado mineiro e no Sudeste, alternadas com períodos secos no Sul, prejudicaram a colheita e a qualidade da batata em vários meses de 2026. Como o ciclo da cultura é curto e o produto é perecível, qualquer problema já aparece rápido no preço — criando picos e quedas fortes ao longo do ano.',
+    fontes:[{titulo:'ABBIN — Preços em alta: o que está por trás da atual gangorra da batata', url:'https://abbin.org/precos-em-alta-o-que-esta-por-tras-da-atual-gangorra-da-batata-no-brasil/', data:'março de 2026'}]},
+  'batata-fertilizante':{titulo:'Fertilizante mais caro', categoria:'cambio-economia', produtoPai:'batata', macro:'guerra-ucrania',
+    resumo:'O Brasil importa cerca de 85% do fertilizante que usa, e Rússia e Belarus respondem por boa parte das exportações mundiais de potássio. Entre janeiro e abril de 2026, os preços de importação de fertilizante subiram entre 18% e 41% conforme o tipo — encarecendo diretamente o custo de produzir batata, cultura que usa bastante insumo.',
+    fontes:[{titulo:'Scot Consultoria — Carta Insumos', url:'https://www.scotconsultoria.com.br/noticias/cartas/60471/carta-insumos-custos-de-importa%C3%A7%C3%A3o-de-fertilizantes-crescem-no-primeiro-quadrimestre-de-2026-e-elevam-preocupa%C3%A7%C3%B5es-para-a-safra-2026-27.htm', data:'21 de maio de 2026'},{titulo:'Blocktrends — Crise de fertilizantes 2026', url:'https://blocktrends.com.br/crise-fertilizantes-2026-guerra-ucrania-impacto-agronegocio-brasil/', data:'abril de 2026'}]},
+  'batata-diesel':{titulo:'Diesel mais caro encarece o frete', categoria:'logistica', produtoPai:'batata', macro:'diesel-alta',
+    resumo:'Em março de 2026, a Petrobras reajustou o diesel em R$ 0,38/litro (alta de 11,6%) nas refinarias. Reajustes assim disparam automaticamente a atualização da tabela de frete mínimo da ANTT, encarecendo o transporte da batata da lavoura até o mercado.',
+    fontes:[{titulo:'Agência iNFRA', url:'https://agenciainfra.com/blog/petrobras-reajusta-diesel-em-38-centavos-por-litro-em-suas-refinarias/', data:'13 de março de 2026'}]},
+  'batata-colheita':{titulo:'Pico da colheita de inverno derruba o preço', categoria:'clima', produtoPai:'batata',
+    resumo:'Julho costuma ser o pico da colheita das safras de seca e inverno no Sudeste e no Sul. Em 2026 o clima firme permitiu ritmo normal de colheita, a oferta aumentou nas centrais de abastecimento e o preço caiu por dois meses seguidos — revertendo parte da alta anterior do ano.',
+    fontes:[{titulo:'CNN Brasil — Preço dos alimentos cai em julho', url:'https://www.cnnbrasil.com.br/agro/preco-dos-alimentos-cai-067-em-julho-e-ajuda-a-conter-inflacao/', data:'11-12 de agosto de 2026'}]},
+
+  'arroz-area-plantada':{titulo:'Menos área plantada de arroz', categoria:'cambio-economia', produtoPai:'arroz', macro:'disputa-terra',
+    resumo:'O IBGE mediu queda de 12,3% na área colhida de arroz em 2026 frente a 2025. Produtores plantaram menos porque os preços de 2025 estavam muito baixos e não cobriam os custos — muitos trocaram parte da lavoura de arroz por soja, cultura vista como mais rentável.',
+    fontes:[{titulo:'IBGE — Levantamento Sistemático da Produção Agrícola', url:'https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/47564-em-junho-ibge-preve-safra-de-347-4-milhoes-de-toneladas-para-2026', data:'14 de julho de 2026'},{titulo:'AgFeed — Com preços baixos, arrozeiros reduzem área plantada', url:'https://agfeed.com.br/economia/perspectiva-2026/com-precos-baixos-arrozeiros-reduzem-area-plantada-e-buscam-equilibrio-financeiro-em-2026/', data:'2026'}]},
+  'arroz-el-nino':{titulo:'Risco climático do El Niño para a próxima safra', categoria:'clima', produtoPai:'arroz',
+    resumo:'Analistas apontam o El Niño 2026/27 como a principal variável que vai definir a área plantada e a produtividade do arroz no Rio Grande do Sul — estado que produz cerca de 70% do arroz nacional. A incerteza já está fazendo produtores adiarem a compra de insumos e o planejamento do plantio.',
+    fontes:[{titulo:'aRede / Safras & Mercado', url:'https://arede.info/a-forca-do-agro/662087/el-nino-pode-reduzir-safra-de-arroz-em-202627', data:'19 de julho de 2026'}]},
+  'arroz-retencao':{titulo:'Produtores retêm o produto, indústria recompõe estoque', categoria:'logistica', produtoPai:'arroz',
+    resumo:'Com a colheita 2025/26 encerrada, sobrou pouco arroz no mercado e os produtores só vendem a preços que consideram atrativos. Ao mesmo tempo, a indústria precisou recompor estoques baixos — essa combinação de pouca oferta com mais demanda empurrou o preço para cima (+22% em cerca de 6 semanas).',
+    fontes:[{titulo:'Planeta Arroz', url:'https://planetaarroz.com.br/preco-do-arroz-dispara-22-e-chega-a-r-7360-por-saca/', data:'13 de agosto de 2026'}]},
+  'arroz-exportacao':{titulo:'Exportações em alta, puxadas pelo câmbio', categoria:'cambio-economia', produtoPai:'arroz', macro:'cambio-dolar',
+    resumo:'As exportações brasileiras de arroz somaram 1,2 milhão de toneladas entre janeiro e agosto de 2026, 25% acima do mesmo período do ano anterior — a valorização do dólar tornou o arroz brasileiro mais competitivo lá fora. Quanto mais arroz sai para o exterior, menos sobra para o mercado interno.',
+    fontes:[{titulo:'Planeta Arroz', url:'https://planetaarroz.com.br/preco-do-arroz-dispara-22-e-chega-a-r-7360-por-saca/', data:'13 de agosto de 2026'}]},
+
+  'feijao-chuva':{titulo:'Excesso de chuva na hora da colheita', categoria:'clima', produtoPai:'feijao',
+    resumo:'Chuvas fortes bem na hora da colheita — especialmente no Paraná, Bahia e Mato Grosso do Sul — dificultaram a colheita e reduziram a qualidade do grão. Um produtor relatou ter colhido metade do que esperava. Isso encareceu o produto disponível logo no início de 2026.',
+    fontes:[{titulo:'Agência Brasil (EBC)', url:'https://agenciabrasil.ebc.com.br/economia/noticia/2026-04/excesso-de-chuvas-causa-aumento-no-pre%C3%A7o-do-feijao', data:'9 de abril de 2026'}]},
+  'feijao-area-plantada':{titulo:'Área de feijão perde espaço para soja e milho', categoria:'cambio-economia', produtoPai:'feijao', macro:'disputa-terra',
+    resumo:'A área de feijão da 1ª safra caiu de quase 1 milhão de hectares há dez anos para 796 mil hectares em 2025/26 — queda de mais de 30% em pouco mais de uma década. Produtores preferem plantar soja e milho, vistos como mais rentáveis, porque o preço do feijão ficou baixo por muito tempo.',
+    fontes:[{titulo:'CNN Brasil — Baixos estoques de feijão acendem alerta', url:'https://www.cnnbrasil.com.br/agro/baixos-estoques-de-feijao-acendem-alerta-para-precos-em-2026/', data:'8 de janeiro de 2026'},{titulo:'AgFeed', url:'https://agfeed.com.br/economia/perspectiva-2026/feijao-perde-espaco-para-outros-cultivos-e-com-menos-area-deve-ver-precos-subindo-em-2026/', data:'8 de janeiro de 2026'}]},
+  'feijao-estoques':{titulo:'Estoques de segurança historicamente baixos', categoria:'logistica', produtoPai:'feijao',
+    resumo:'O Brasil entrou em 2026 com estoque de feijão equivalente a apenas 15 dias de consumo, quando o padrão saudável seria de 60 dias. Sem essa reserva, qualquer problema na safra seguinte (chuva, atraso de colheita) tem efeito imediato e amplificado sobre o preço.',
+    fontes:[{titulo:'CNN Brasil', url:'https://www.cnnbrasil.com.br/agro/baixos-estoques-de-feijao-acendem-alerta-para-precos-em-2026/', data:'8 de janeiro de 2026'}]},
+  'feijao-produtividade':{titulo:'Queda de produtividade nas regiões produtoras', categoria:'clima', produtoPai:'feijao',
+    resumo:'Além da menor área plantada, a produtividade por hectare também caiu nas principais regiões produtoras em 2025/26. O índice CEPEA/CNA atribui boa parte da alta do 1º semestre de 2026 a essa combinação de perda de produtividade com redução de área.',
+    fontes:[{titulo:'Canal Rural (índice CEPEA/CNA)', url:'https://www.canalrural.com.br/economia/quebras-de-safra-sustentam-alta-do-feijao-em-2026-aponta-indice-cepea-cna/', data:'22 de junho de 2026'}]},
+
+  'cafe-seca-brasil':{titulo:'Seca durante a floração em São Paulo e Minas Gerais', categoria:'clima', produtoPai:'cafe',
+    resumo:'Uma seca severa atingiu SP e MG bem no período de floração do café (outubro de 2024), reduzindo a produtividade da safra seguinte. A safra 2025/26 foi projetada em queda de 5% no total e de 15% na produção de arábica, com grãos menores e de qualidade inferior.',
+    fontes:[{titulo:'Portal do Agronegócio', url:'https://www.portaldoagronegocio.com.br/agricultura/cafe/noticias/perspectivas-de-precos-elevados-para-o-cafe-em-2025-com-safra-brasileira-prejudicada', data:'6 de janeiro de 2025'}]},
+  'cafe-vietna':{titulo:'Enchentes no Vietnã atingem o café robusta', categoria:'clima', produtoPai:'cafe',
+    resumo:'O Vietnã é o maior produtor mundial de café robusta. Em novembro de 2025, chuvas torrenciais (mais de 1,5 metro em três dias em alguns pontos) atingiram a região central produtora bem no início da colheita, gerando incerteza sobre perdas de grãos e qualidade.',
+    fontes:[{titulo:'Conexão Safra', url:'https://conexaosafra.com/cafeicultura/enchentes-no-vietna-criam-incertezas-e-podem-interferir-no-preco-do-cafe/', data:'25 de novembro de 2025'}]},
+  'cafe-cambio':{titulo:'Dólar alto puxa café para exportação', categoria:'cambio-economia', produtoPai:'cafe', macro:'cambio-dolar',
+    resumo:'O café é negociado em dólar nas bolsas de Nova York e Londres — quando o dólar sobe, fica mais vantajoso para o produtor brasileiro exportar do que vender no mercado interno. Em 2024 as exportações bateram recorde (50,5 milhões de sacas, +28,8%) mesmo com a produção caindo apenas 1,6%, sobrando menos café para o consumidor brasileiro.',
+    fontes:[{titulo:'Brasil de Fato (dados Embrapa Café)', url:'https://www.brasildefato.com.br/2025/01/23/producao-em-queda-e-exportacao-em-alta-o-que-explica-a-alta-do-cafe/', data:'21 de janeiro de 2025'}]},
+  'cafe-tarifa-eua':{titulo:'Tarifa dos EUA sobre o café brasileiro', categoria:'tributario', produtoPai:'cafe', macro:'tarifaco-eua',
+    resumo:'Em julho de 2025, o governo dos EUA aplicou uma tarifa adicional de 40% sobre produtos brasileiros — somada aos 10% recíprocos já existentes, chegando a 50% sobre o café. Isso chegou a paralisar boa parte das compras americanas e gerou volatilidade nos preços internacionais. Em novembro de 2025 a tarifa extra foi revogada para café, carne e outros itens agrícolas.',
+    fontes:[{titulo:'Daily Coffee News', url:'https://dailycoffeenews.com/2025/11/21/trump-order-eliminates-all-tariffs-on-brazilian-coffee/', data:'21 de novembro de 2025'},{titulo:'Aos Fatos', url:'https://www.aosfatos.org/noticias/trump-nao-cancelou-tarifa/', data:'2026'}]},
+  'cafe-portos':{titulo:'Gargalos nos portos encarecem a exportação', categoria:'logistica', produtoPai:'cafe',
+    resumo:'Em 2025, a infraestrutura dos portos brasileiros — especialmente Santos — não deu conta do volume recorde de café para exportar: filas de caminhões, pátios lotados e navios com até 82 dias de espera em dezembro. Isso gerou um prejuízo estimado de R$ 66,1 milhões ao setor exportador só em 2025, custo que tende a ser repassado na cadeia.',
+    fontes:[{titulo:'Notícias Agrícolas (Cecafé)', url:'https://www.noticiasagricolas.com.br/noticias/cafe/414528-exportadores-de-cafe-encerram-2025-com-prejuizo-logistico-de-r-66-1-mi-devido-a-esgotamento-da-infraestrutura-portuaria.html', data:'27 de janeiro de 2026'}]},
+
+  'carne-ciclo-pecuario':{titulo:'Pecuaristas retendo fêmeas para reprodução', categoria:'cambio-economia', produtoPai:'carne',
+    resumo:'Pecuaristas estão guardando mais vacas e novilhas no campo para reprodução em vez de vender para abate, apostando que o rebanho seguirá valorizado. A participação de fêmeas no abate caiu de 54,78% (2025) para 50,98% (2026) em Mato Grosso — reduzindo a oferta de gado hoje.',
+    fontes:[{titulo:'CompreRural', url:'https://www.comprerural.com/mt-retencao-de-femeas-e-aumento-no-abate-de-machos-marcam-virada-do-ciclo-pecuario-em-2026/', data:'2026'}]},
+  'carne-china':{titulo:'Corrida para exportar carne à China', categoria:'geopolitica', produtoPai:'carne',
+    resumo:'A China é a maior compradora de carne bovina do Brasil, e os frigoríficos correram para exportar o máximo dentro da cota anual com tarifa reduzida (12%, contra 55% fora da cota). A disputa por gado para abater fez o preço da arroba bater recorde em abril de 2026; quando a cota se esgotou, em junho, a pressão sobre o mercado interno aliviou.',
+    fontes:[{titulo:'Brasilagro', url:'https://www.brasilagro.com.br/conteudo/corrida-para-exportar-carne-a-china-faz-preco-do-boi-bater-recorde.html', data:'8 de abril de 2026'}]},
+  'carne-tarifa-eua':{titulo:'Tarifa de 50% dos EUA sobre a carne brasileira', categoria:'tributario', produtoPai:'carne', macro:'tarifaco-eua',
+    resumo:'Em julho de 2025, os EUA — segundo maior mercado da carne brasileira — impuseram uma tarifa adicional de 50% sobre as importações do Brasil. Sem esse mercado premium absorvendo parte da produção, mais carne fica disponível internamente, o que ajudaria a segurar o preço — mas esse efeito foi superado pela demanda da China e pela retenção de fêmeas.',
+    fontes:[{titulo:'BeefPoint', url:'https://beefpoint.com.br/tarifa-de-50-de-trump-sobre-a-carne-bovina-brasileira-impactos-reais-para-o-agro/', data:'2025'}]},
+  'carne-custo-producao':{titulo:'Diesel e ração encarecem o confinamento', categoria:'logistica', produtoPai:'carne', macro:'diesel-alta',
+    resumo:'Parte do custo de engordar o boi em confinamento sobe conforme o preço do diesel (que encarece o frete de ração e do próprio gado) e do milho/soja. Em março de 2026, o custo diário do confinamento voltou a subir, puxado principalmente pelo frete mais caro por causa da alta do diesel.',
+    fontes:[{titulo:'Farmnews (Scot Consultoria)', url:'https://farmnews.com.br/gestao/custo-de-producao-de-bovinos-confinados-em-marco-de-2026-impacto-pela-alta-dos-combustiveis/', data:'março de 2026'}]},
+
+  'azeite-seca':{titulo:'Seca e onda de calor no Mediterrâneo', categoria:'clima', produtoPai:'azeite',
+    resumo:'Espanha, Itália e Grécia respondem por mais de 60% da produção mundial de azeite. Em 2022 e 2023, seca prolongada e calor extremo durante a floração das oliveiras reduziram fortemente as colheitas — um dos piores ciclos já registrados no setor, que encareceu o azeite no mundo todo.',
+    fontes:[{titulo:'CNN Brasil', url:'https://www.cnnbrasil.com.br/nacional/azeite-de-oliva-extra-virgem-fica-ate-80-mais-caro-no-brasil-em-2023/', data:'25 de dezembro de 2023'},{titulo:'International Olive Council, via Tridge', url:'https://www.tridge.com/news/the-ioc-estimates-that-world-olive-oil-produ-ezhdsj', data:'12 de janeiro de 2026'}]},
+  'azeite-cambio':{titulo:'Importação quase total torna o preço refém do dólar', categoria:'cambio-economia', produtoPai:'azeite', macro:'cambio-dolar',
+    resumo:'Mais de 90% do azeite consumido no Brasil vem de fora, principalmente Portugal e Espanha. O comércio internacional é referenciado em dólar mesmo quando a transação é em euros — quando o dólar sobe, o importador precisa de mais reais para comprar a mesma quantidade. Frete marítimo e seguro de carga, também cotados em dólar, ampliam o efeito.',
+    fontes:[{titulo:'Correio Braziliense', url:'https://www.correiobraziliense.com.br/aqui/2026/04/14/como-a-cotacao-do-dolar-afeta-o-preco-do-vinho-e-do-azeite-na-sua-mesa/', data:'14 de abril de 2026'}]},
+  'azeite-imposto':{titulo:'Governo zerou o imposto de importação', categoria:'tributario', produtoPai:'azeite',
+    resumo:'Até início de 2025, o azeite pagava 9% de imposto de importação — mais de R$ 400 milhões aos cofres públicos em 2024. Em março de 2025, o governo zerou essa alíquota (junto com carne, café, milho, massas e biscoitos) numa tentativa explícita de conter a inflação de alimentos. O próprio fato de recorrer a essa medida mostra o peso do imposto no preço final.',
+    fontes:[{titulo:'Exame', url:'https://exame.com/economia/governo-zera-imposto-de-importacao-de-carne-cafe-milho-azeite-de-oliva-massas-e-biscoitos/', data:'6 de março de 2025'},{titulo:'CNN Brasil (blog Fernando Nakagawa)', url:'https://www.cnnbrasil.com.br/blogs/fernando-nakagawa/economia/macroeconomia/azeite-pagou-mais-de-r-400-mi-em-imposto-de-importacao-em-2024/', data:'2025'}]},
+  'azeite-frete':{titulo:'Frete marítimo internacional em alta', categoria:'logistica', produtoPai:'azeite', macro:'diesel-alta',
+    resumo:'O frete marítimo internacional voltou a subir em 2026, pressionado por tensões geopolíticas em rotas estratégicas, petróleo mais caro e novas regras ambientais europeias — o que encarece qualquer produto importado por navio, incluindo o azeite. Sinalizamos que a ligação direta com o azeite tem sourcing mais fraco que as outras causas listadas aqui.',
+    fontes:[{titulo:'Remessa Online', url:'https://www.remessaonline.com.br/blog/frete-maritimo-dispara-alta/', data:'agosto de 2026'}]},
+
+  'leite-entressafra':{titulo:'Queda na oferta de leite na entressafra', categoria:'clima', produtoPai:'leite',
+    resumo:'Em vários meses de 2026, menos chuva e pastagens de pior qualidade no período de entressafra reduziram a quantidade de leite que os produtores conseguem tirar do rebanho. O índice de captação de leite (CEPEA) caiu 3,6% só entre janeiro e fevereiro, e mais de 14% no acumulado até abril.',
+    fontes:[{titulo:'CEPEA/Esalq, via Notícias Agrícolas', url:'https://www.noticiasagricolas.com.br/noticias/leite/421299-preco-do-leite-sobe-17-6-no-primeiro-trimestre-e-mercado-reage-a-oferta-restrita-no-campo.html', data:'21 de maio de 2026'}]},
+  'leite-custo-producao':{titulo:'Ração, insumos e diesel mais caros', categoria:'cambio-economia', produtoPai:'leite', macro:'diesel-alta',
+    resumo:'O custo de manter o gado leiteiro subiu com ração mais cara e, principalmente, diesel — que subiu 13,9% em março de 2026. No Paraná, em 2025 eram necessários 27,7 litros de leite para comprar uma saca de milho; em 2026 passaram a ser precisos 29,4 litros.',
+    fontes:[{titulo:'Exame', url:'https://exame.com/agro/precos-do-leite-saltam-12-no-brasil-e-nao-devem-cair-tao-cedo/', data:'15 de abril de 2026'},{titulo:'Deral/Seab-PR, via NotíciaMarajó', url:'https://noticiamarajo.com.br/agronegocio/custo-de-producao-do-leite-sobe-no-parana-com-alta-do-milho-e-farelo-de-soja-aponta-deral/', data:'6 de maio de 2026'}]},
+  'leite-concorrencia':{titulo:'Laticínios disputando um leite mais escasso', categoria:'cambio-economia', produtoPai:'leite',
+    resumo:'Com menos leite disponível no campo, as indústrias de laticínios passaram a disputar mais agressivamente o leite cru dos produtores — o que empurra o preço pago por litro para cima. É um efeito de oferta restrita, mais do que de aumento de demanda do consumidor final.',
+    fontes:[{titulo:'CEPEA/Esalq-USP', url:'https://www.cepea.org.br/br/releases/leite-cepea-preco-ao-produtor-avanca-pelo-quarto-mes-consecutivo.aspx', data:'1º de junho de 2026'}]},
+  'leite-mercosul':{titulo:'Acordo Mercosul-União Europeia dispara importações', categoria:'geopolitica', produtoPai:'leite',
+    resumo:'A partir de 1º de maio de 2026, entrou em vigor provisoriamente o acordo Mercosul-UE, coincidindo com um salto recorde nas importações brasileiras de lácteos — a importação de queijos cresceu 101% em volume. Isso cria um teto que limita quanto os laticínios conseguem reajustar o preço ao consumidor, mesmo com o custo de produção em alta.',
+    fontes:[{titulo:'Terraviva (dados SECEX/MDIC)', url:'https://terraviva.com.br/selectus/?idto=53370', data:'referente a maio de 2026'}]},
+
+  'pizza-queijo':{titulo:'Mussarela mais cara', categoria:'cambio-economia', produtoPai:'pizza', ver_tambem_produtos:['leite'],
+    resumo:'A mussarela é um dos insumos mais caros da pizza, e seu preço sobe junto com o custo do leite — puxado por ração, fertilizante, energia e diesel mais caros no campo, além de clima desfavorável às pastagens. Isso se repassa quase direto ao preço final da pizza.',
+    fontes:[{titulo:'CNN Brasil', url:'https://www.cnnbrasil.com.br/agro/leite-deve-ficar-mais-caro-ao-longo-de-2026-e-explicacao-esta-no-campo/', data:'20 de maio de 2026'}]},
+  'pizza-trigo':{titulo:'Trigo e farinha mais caros', categoria:'geopolitica', produtoPai:'pizza', macro:'guerra-ucrania',
+    resumo:'O trigo da massa ficou mais caro por três motivos somados em 2026: o dólar mais alto encarece o trigo importado, os EUA tiveram a menor safra de trigo de inverno desde os anos 1970 por causa da seca, e as tensões no Mar Negro seguem restringindo a oferta mundial de grão.',
+    fontes:[{titulo:'CNN Brasil', url:'https://www.cnnbrasil.com.br/agro/trigo-em-alta-fara-precos-de-pao-e-massas-subirem/', data:'23 de março de 2026'},{titulo:'NN Online', url:'https://www.nnonline.com.br/2026/07/o-trigo-enfrenta-novas-incertezas.html', data:'29 de julho de 2026'}]},
+  'pizza-taxa-ifood':{titulo:'Comissão dos aplicativos de delivery', categoria:'logistica', produtoPai:'pizza',
+    resumo:'O iFood cobra dos restaurantes uma comissão sobre o valor da venda que varia por plano — taxas de até 23% no plano com entrega incluída, reajustada para 24% no modelo "Entrega Flex" a partir de fevereiro de 2026. Restaurantes e a Abrasel afirmam à Câmara dos Deputados que taxas mais altas encarecem a comida para o consumidor final.',
+    fontes:[{titulo:'IstoÉ Dinheiro', url:'https://istoedinheiro.com.br/restaurantes-sofrem-pressao-do-ifood-com-aumento-de-taxas-diz-abrasel', data:'2023'},{titulo:'FoodBiz Brasil', url:'https://foodbizbrasil.com/informacoes-de-mercado/ifood-aumenta-taxa-entrega-flex-2026/', data:'22 de janeiro de 2026'}]},
+  'pizza-margem':{titulo:'Restaurantes seguram parte do aumento na própria margem', categoria:'cambio-economia', produtoPai:'pizza',
+    resumo:'Em março de 2026, a alimentação fora do domicílio subiu só 0,61% no IPCA — bem menos que a alimentação em casa (1,94%). Numa pesquisa da Abrasel, 35% dos estabelecimentos não reajustaram preços nos últimos 12 meses, ou seja, o setor está absorvendo parte do aumento de custos na própria margem, não repassando tudo ao preço da pizza.',
+    fontes:[{titulo:'Abrasel, via Bahia Econômica', url:'https://bahiaeconomica.com.br/wp/2026/04/10/bares-e-restaurantes-seguem-segurando-precos-mesmo-com-tendencia-de-alta-dos-insumos/', data:'10 de abril de 2026'}]},
+
+  /* -------- raízes compartilhadas (macro) -------- */
+  'guerra-ucrania':{titulo:'Guerra na Ucrânia', categoria:'geopolitica', isMacro:true,
+    resumo:'A guerra entre Rússia e Ucrânia, e as sanções que vieram junto, afetam dois mercados de que o Brasil depende: fertilizante (Rússia e Belarus são grandes exportadores de potássio) e trigo (Rússia e Ucrânia são grandes exportadores mundiais do grão). Isso encarece a produção de vários alimentos no Brasil, mesmo o país não estando envolvido no conflito.',
+    fontes:[{titulo:'Blocktrends', url:'https://blocktrends.com.br/crise-fertilizantes-2026-guerra-ucrania-impacto-agronegocio-brasil/', data:'abril de 2026'},{titulo:'NN Online', url:'https://www.nnonline.com.br/2026/07/o-trigo-enfrenta-novas-incertezas.html', data:'29 de julho de 2026'}]},
+  'cambio-dolar':{titulo:'Dólar mais caro', categoria:'cambio-economia', isMacro:true,
+    resumo:'Quando o dólar sobe, tudo que o Brasil importa (fertilizante, trigo, azeite) fica mais caro em reais, e tudo que o Brasil pode exportar (café, arroz, carne) fica mais atrativo vender lá fora — o que tira produto do mercado interno. É um efeito de mão dupla que aparece repetidamente na cadeia de alimentos.',
+    fontes:[{titulo:'Correio Braziliense — como o dólar afeta o preço do azeite', url:'https://www.correiobraziliense.com.br/aqui/2026/04/14/como-a-cotacao-do-dolar-afeta-o-preco-do-vinho-e-do-azeite-na-sua-mesa/', data:'14 de abril de 2026'}]},
+  'tarifaco-eua':{titulo:'Tarifas dos Estados Unidos sobre produtos do Brasil', categoria:'tributario', isMacro:true,
+    resumo:'Em julho de 2025, o governo dos Estados Unidos impôs uma tarifa adicional de 40% sobre diversos produtos brasileiros — chegando a 50% somada à tarifa recíproca já existente — como retaliação política. Café e carne, dois dos principais produtos de exportação do agronegócio brasileiro, foram diretamente afetados, com efeitos que ainda reverberam mesmo após parte da tarifa ter sido revogada para alimentos.',
+    fontes:[{titulo:'Daily Coffee News', url:'https://dailycoffeenews.com/2025/11/21/trump-order-eliminates-all-tariffs-on-brazilian-coffee/', data:'21 de novembro de 2025'},{titulo:'BeefPoint', url:'https://beefpoint.com.br/tarifa-de-50-de-trump-sobre-a-carne-bovina-brasileira-impactos-reais-para-o-agro/', data:'2025'}]},
+  'diesel-alta':{titulo:'Diesel e frete mais caros', categoria:'logistica', isMacro:true,
+    resumo:'O preço do diesel afeta o custo de transportar praticamente qualquer alimento da fazenda até a mesa, além de encarecer o frete marítimo internacional de produtos importados. Um reajuste da Petrobras nas refinarias se espalha pela cadeia inteira — do caminhão que leva a batata ao navio que traz o azeite.',
+    fontes:[{titulo:'Agência iNFRA — Petrobras reajusta diesel', url:'https://agenciainfra.com/blog/petrobras-reajusta-diesel-em-38-centavos-por-litro-em-suas-refinarias/', data:'13 de março de 2026'}]},
+  'disputa-terra':{titulo:'Disputa por terra: soja e milho vs. arroz e feijão', categoria:'cambio-economia', isMacro:true,
+    resumo:'Quando soja e milho ficam mais rentáveis que arroz e feijão, produtores trocam de cultura — reduzindo a área plantada dos alimentos que vão direto para o prato do brasileiro. A área de feijão da 1ª safra caiu mais de 30% em uma década, e o arroz perdeu 12,3% de área só entre 2025 e 2026, num movimento estrutural que se repete a cada ciclo de preço.',
+    fontes:[{titulo:'IBGE — Levantamento Sistemático da Produção Agrícola', url:'https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/47564-em-junho-ibge-preve-safra-de-347-4-milhoes-de-toneladas-para-2026', data:'14 de julho de 2026'}]}
+};
+
+/* ===================== HELPERS ===================== */
+function esc(s){
+  const d=document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML;
+}
+function catLabelHtml(cat){
+  return '<span class="cat-label '+cat+'">'+esc(CATEGORIAS[cat]||cat)+'</span>';
+}
+/* Placeholder photo — empty on purpose. Swap for a real <img src="data:..."> once a photo exists */
+function photoHtml(extraClass){
+  return '<div class="photo'+(extraClass?' '+extraClass:'')+'"></div>';
+}
+function fontesHtml(fontes){
+  return '<div class="fontes-block"><p class="section-label">Fontes</p>' +
+    fontes.map(f=>'<div class="fonte-item"><a href="'+esc(f.url)+'" target="_blank" rel="noopener">'+esc(f.titulo)+'</a><span class="data mono">'+esc(f.data)+'</span></div>').join('') +
+    '</div>';
+}
+function causasQueApontamPara(macroId){
+  return Object.keys(CAUSAS).filter(k => CAUSAS[k].macro === macroId);
+}
+
+/* ===================== VIEWS ===================== */
+function viewHome(){
+  const cards = Object.values(PRODUTOS).map(p => {
+    const d = p.destaque;
+    return '<a class="card prod-card" href="#/produto/'+p.id+'">' +
+      photoHtml() +
+      '<div class="body">' +
+        '<div class="nome">'+esc(p.nome)+'</div>' +
+        '<div class="preco tabular">'+esc(p.preco.valor)+'</div>' +
+        '<span class="delta '+d.direcao+' tabular">'+(d.direcao==='alta'?'▲':'▼')+' '+esc(d.valor)+'</span>' +
+      '</div>' +
+      '</a>';
+  }).join('');
+
+  return '<div class="intro">' +
+    '<span class="kicker">Investigação de preços · Brasil, 2026</span>' +
+    '<h1>Por que a comida está tão cara?</h1>' +
+    '<p>Não é só um vilão. Escolha um alimento, veja o que aconteceu com o preço dele e clique em cada causa para investigar até a raiz — com fonte oficial e data em cada número que aparece aqui.</p>' +
+    '</div>' +
+    '<p class="section-label">Alimentos investigados</p>' +
+    '<div class="grid">'+cards+'</div>';
+}
+
+function viewProduto(id){
+  const p = PRODUTOS[id];
+  if(!p) return viewNotFound();
+  const outrasHtml = (p.outras&&p.outras.length) ? (
+    '<details class="outras"><summary>ver outras variações registradas</summary>' +
+    '<div class="outras-list">' +
+    p.outras.map(o=>'<div class="outras-item"><span class="periodo">'+esc(o.periodo)+':</span> <span class="valor tabular">'+esc(o.valor)+'</span>' +
+      '<div class="fonte-line">fonte: <a href="'+esc(o.url)+'" target="_blank" rel="noopener">'+esc(o.fonte)+'</a> · '+esc(o.data)+'</div></div>').join('') +
+    '</div></details>'
+  ) : '';
+  const notaHtml = p.nota ? '<div class="nota-box"><strong>Transparência sobre os dados:</strong> '+esc(p.nota)+'</div>' : '';
+
+  const causasHtml = p.causas.map(cid => {
+    const c = CAUSAS[cid];
+    return '<a class="card causa-card" href="#/causa/'+cid+'">' +
+      catLabelHtml(c.categoria) +
+      '<h3>'+esc(c.titulo)+'</h3>' +
+      '<p>'+esc(c.resumo.slice(0,120))+'…</p>' +
+      '<span class="arrow">investigar →</span>' +
+      '</a>';
+  }).join('');
+
+  return '<button class="back-link" onclick="location.hash=\'#/\'">← todos os alimentos</button>' +
+    '<div class="prod-head">' +
+      photoHtml() +
+      '<div class="body">' +
+        '<h1>'+esc(p.nome)+'</h1><div class="unidade-label">'+esc(p.preco.unidade)+'</div>' +
+        '<div class="price-row"><span class="valor tabular">'+esc(p.preco.valor)+'</span></div>' +
+        '<div class="fonte-line">fonte: <a href="'+esc(p.preco.url)+'" target="_blank" rel="noopener">'+esc(p.preco.fonte)+'</a> · '+esc(p.preco.data)+'</div>' +
+        '<div class="destaque-line"><span class="delta '+p.destaque.direcao+' tabular">'+(p.destaque.direcao==='alta'?'▲':'▼')+' '+esc(p.destaque.valor)+'</span> '+esc(p.destaque.periodo)+'</div>' +
+        '<div class="fonte-line">fonte: <a href="'+esc(p.destaque.url)+'" target="_blank" rel="noopener">'+esc(p.destaque.fonte)+'</a> · '+esc(p.destaque.data)+'</div>' +
+        outrasHtml + notaHtml +
+      '</div>' +
+    '</div>' +
+    '<p class="section-label">O que está por trás desse preço</p>' +
+    '<div class="grid">'+causasHtml+'</div>';
+}
+
+function viewCausa(id){
+  const c = CAUSAS[id];
+  if(!c) return viewNotFound();
+
+  const backTarget = c.produtoPai ? ('#/produto/'+c.produtoPai) : '#/';
+  const backLabel = c.produtoPai ? ('← voltar para '+PRODUTOS[c.produtoPai].nome) : '← voltar ao início';
+
+  let rootHtml = '';
+  if(c.macro && CAUSAS[c.macro]){
+    const m = CAUSAS[c.macro];
+    rootHtml = '<a class="root-link" href="#/causa/'+c.macro+'">' +
+      '<div><span class="lab">ir até a raiz</span><span class="name">'+esc(m.titulo)+'</span></div>' +
+      '<span class="go">→</span></a>';
+  }
+
+  let verTambemHtml = '';
+  if(c.ver_tambem_produtos && c.ver_tambem_produtos.length){
+    verTambemHtml = '<div class="connect-box"><p class="section-label">Esse mesmo fator também aparece em</p><div class="connect-list">' +
+      c.ver_tambem_produtos.map(pid=>{
+        const pp = PRODUTOS[pid];
+        return '<a class="connect-item" href="#/produto/'+pid+'"><span class="left">'+esc(pp.nome)+'</span><span class="go">→</span></a>';
+      }).join('') + '</div></div>';
+  }
+
+  let conectadosHtml = '';
+  if(c.isMacro){
+    const ligados = causasQueApontamPara(id);
+    if(ligados.length){
+      conectadosHtml = '<div class="connect-box"><p class="section-label">Produtos afetados por esta mesma raiz</p><div class="connect-list">' +
+        ligados.map(lid=>{
+          const l = CAUSAS[lid];
+          const pp = PRODUTOS[l.produtoPai];
+          return '<a class="connect-item" href="#/causa/'+lid+'"><span class="left">'+esc(l.titulo)+' <span class="prod-tag">'+esc(pp.nome)+'</span></span><span class="go">→</span></a>';
+        }).join('') + '</div></div>';
+    }
+  }
+
+  return '<button class="back-link" onclick="location.hash=\''+backTarget+'\'">'+backLabel+'</button>' +
+    '<div class="causa-head">' + catLabelHtml(c.categoria) + '<h1>'+esc(c.titulo)+'</h1></div>' +
+    '<div class="prose"><p>'+esc(c.resumo)+'</p></div>' +
+    fontesHtml(c.fontes) +
+    rootHtml + verTambemHtml + conectadosHtml;
+}
+
+function viewNotFound(){
+  return '<div class="intro"><h1>Não achamos essa página</h1><p>Volte para o início e escolha um alimento.</p></div>' +
+    '<button class="back-link" onclick="location.hash=\'#/\'">← início</button>';
+}
+
+/* ===================== ROUTER ===================== */
+function render(){
+  const app = document.getElementById('app');
+  const hash = location.hash.replace(/^#\/?/, '');
+  const parts = hash.split('/').filter(Boolean);
+  let html;
+  if(parts.length===0){ html = viewHome(); }
+  else if(parts[0]==='produto' && parts[1]){ html = viewProduto(parts[1]); }
+  else if(parts[0]==='causa' && parts[1]){ html = viewCausa(parts[1]); }
+  else { html = viewNotFound(); }
+
+  app.style.animation='none'; app.offsetHeight; app.style.animation='';
+  app.innerHTML = html;
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
+}
+window.addEventListener('hashchange', render);
+window.addEventListener('DOMContentLoaded', render);
+render();
+
+/* ===================== THEME TOGGLE ===================== */
+(function(){
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const saved = (function(){ try{ return localStorage.getItem('raiz-tema'); }catch(e){ return null; } })();
+  if(saved) root.setAttribute('data-theme', saved);
+  btn.addEventListener('click', function(){
+    const current = root.getAttribute('data-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const effectiveIsDark = current ? current==='dark' : prefersDark;
+    const next = effectiveIsDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem('raiz-tema', next); }catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
